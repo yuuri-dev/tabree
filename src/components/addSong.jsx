@@ -9,12 +9,21 @@ export default function AddSong() {
           placeholder="曲名"
           className="w-full border px-3 py-2 rounded"
         />
+        <input
+          type="text"
+          placeholder="アーティスト名"
+          className="w-full border px-3 py-2 rounded"
+        />
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded"
         >
           追加する
         </button>
+
+        <textarea name="" id="">
+          歌詞・コードを入力
+        </textarea>
       </form>
     </div>
   );
