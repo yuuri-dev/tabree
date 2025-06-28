@@ -1,0 +1,4 @@
+# requirements.txt
+supabase
+python-dotenv
+google-generativeai
