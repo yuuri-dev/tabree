@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import SearchForm from '@/components/SearchForm';
 import AddSong from '@/components/AddSongs';
+import Header from '@/components/Header';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('search');
 
   return (
     <div className="max-w-md mx-auto p-4">
+      <Header />
       <div className="flex border-b mb-4">
         <button
           className={`flex-1 py-2 text-center ${
