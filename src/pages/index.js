@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Search from '@/components/Search';
+import SearchForm from '@/components/SearchForm';
 import AddSong from '@/components/AddSongs';
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
       </div>
 
       {/* タブ切り替えの中身 */}
-      {activeTab === 'search' && <Search />}
+      {activeTab === 'search' && <SearchForm />}
       {activeTab === 'add' && <AddSong />}
     </div>
   );
