@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Search from '@/components/Search';
-import AddSong from '@/components/AddSong';
+import AddSong from '@/components/AddSongs';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('search');
