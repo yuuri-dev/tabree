@@ -5,6 +5,28 @@ export default function AddSong() {
   const [songName, setSongName] = useState("");
   const [artistName, setArtistName] = useState("");
   const [songContent, setSongContent] = useState("");
+
+
+  const handleAddSong = async (e) => {
+    e.preventDefault();
+
+    const res = await fetch('/api/song', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: songName,
+        artist: artistName,
+        content: songContent,
+      }),
+    });
+
+    const data = await res.json();
+    console.log('サーバーからの返答:', data);
+  };
+
+
   return (
     <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
@@ -54,6 +76,7 @@ export default function AddSong() {
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+          onClick={(e) => handleAddSong(e)}
         >
           追加する
         </button>
