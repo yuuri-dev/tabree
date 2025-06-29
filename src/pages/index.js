@@ -2,6 +2,7 @@ import { useState } from 'react';
 import SearchForm from '@/components/SearchForm';
 import AddSong from '@/components/AddSongs';
 import Header from '@/components/Header';
+import Ranking from '@/components/Ranking';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('search');
@@ -35,6 +36,7 @@ export default function Home() {
       {/* タブ切り替えの中身 */}
       {activeTab === 'search' && <SearchForm />}
       {activeTab === 'add' && <AddSong />}
+      <Ranking />
     </div>
   );
 }
