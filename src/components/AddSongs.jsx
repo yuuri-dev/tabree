@@ -5,7 +5,8 @@ export default function AddSong() {
   const [songName, setSongName] = useState("");
   const [artistName, setArtistName] = useState("");
   const [songContent, setSongContent] = useState("");
-
+  // Gemini API使用時にローディング状態を管理するstateを追加
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddSong = async (e) => {
     e.preventDefault();
@@ -26,6 +27,48 @@ export default function AddSong() {
     console.log('サーバーからの返答:', data);
   };
 
+  const handleGemini = async (e) => {
+    e.preventDefault(); // フォームのデフォルト送信を防ぐ
+
+    // テキストエリアが空の場合は何もしない
+    if (!songContent.trim()) {
+      alert('歌詞・コードを何か入力してください。');
+      return;
+    }
+
+    setIsLoading(true); // ローディング開始
+
+    try {
+      // API(/api/predict)を呼び出す
+      const res = await fetch('/api/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // predict.jsが要求する`current_text`というキーでデータを送る
+        body: JSON.stringify({
+          current_text: songContent,
+        }),
+      });
+
+      // APIからの応答が成功しなかった場合はエラー
+      if (!res.ok) {
+        throw new Error('APIからの応答がありませんでした。');
+      }
+
+      const data = await res.json();
+      const prediction = data.predicted_text;
+
+      // 現在のテキストの末尾に、半角スペースを挟んで予測結果を追記する
+      setSongContent(prevContent => prevContent + ' ' + prediction);
+
+    } catch (error) {
+      console.error("予測処理中にエラーが発生しました:", error);
+      alert("予測の取得に失敗しました。");
+    } finally {
+      setIsLoading(false); // ローディング終了 (成功しても失敗しても実行)
+    }
+  };
 
   return (
     <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
@@ -72,10 +115,17 @@ export default function AddSong() {
             onChange={(e) => setSongContent(e.target.value)}
           />
         </div>
+        <button
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600
+          text-white font-semibold py-2 px-4 rounded-md transition-colors cursor-pointer"
+          onClick={(e) => handleGemini(e)}
+          disabled={isLoading} // ローディング中はボタンを無効化
+        >{isLoading ? '予測中...' : 'Geminiで予測'}</button>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+          className="w-full bg-blue-600 hover:bg-blue-700 
+          text-white font-semibold py-2 px-4 rounded-md transition-colors cursor-pointer"
           onClick={(e) => handleAddSong(e)}
         >
           追加する
