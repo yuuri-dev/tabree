@@ -17,7 +17,7 @@ const SearchForm = () => {
 
     const { data, error } = await supabase
       .from('tab')
-      .select('id, track_name, artist_name, data')
+      .select('id, track_name, artist_name, data,good')
       .or(`track_name.ilike.%${searchWord}%,artist_name.ilike.%${searchWord}%`);
 
     if (error) {
@@ -31,6 +31,7 @@ const SearchForm = () => {
       title: item.track_name,
       artist: item.artist_name,
       content: item.data,
+      good:item.good,
     }));
 
     setSearchResults(formatted);
