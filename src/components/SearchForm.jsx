@@ -1,43 +1,39 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react'; // 虫眼鏡アイコン
+import { Search } from 'lucide-react';
 import SearchResult from './SearchResult';
+import { supabase } from '../../lib/supabaseClient';
 
 const SearchForm = () => {
   const [searchWord, setSearchWord] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
 
-    // 仮のデータ（あとでAPIと連携）
-    const dummyResults = [
-      {
-        id: 'uuiduuid',
-        title: '小さな恋のうた',
-        artist: 'MONGOL800',
-        content:
-          '[C]君が〜[G]好きだよ[C]君が〜[G]好きだよ[C]君が〜[G]好きだよ[C]君が〜[G]好きだよ',
-      },
-      {
-        id: 'uuiduuid2',
-        title: 'チェリー',
-        artist: 'スピッツ',
-        content: '[F]愛してるの[C]響きだけで〜',
-      },
-    ];
-
-    if (searchWord === "") {
-      alert("検索ワードを入力してください");
+    if (searchWord.trim() === '') {
+      alert('検索ワードを入力してください');
       return;
     }
 
-    const filtered = dummyResults.filter(
-      (song) =>
-        song.title.toLowerCase().includes(searchWord.toLowerCase()) ||
-        song.artist.toLowerCase().includes(searchWord.toLowerCase())
-    );
+    const { data, error } = await supabase
+      .from('tab')
+      .select('id, track_name, artist_name, data')
+      .or(`track_name.ilike.%${searchWord}%,artist_name.ilike.%${searchWord}%`);
 
-    setSearchResults(filtered);
+    if (error) {
+      console.error('検索エラー:', error);
+      alert('検索に失敗しました');
+      return;
+    }
+
+    const formatted = data.map((item) => ({
+      id: item.id,
+      title: item.track_name,
+      artist: item.artist_name,
+      content: item.data,
+    }));
+
+    setSearchResults(formatted);
   };
 
   return (
@@ -61,7 +57,6 @@ const SearchForm = () => {
         </button>
       </form>
 
-      {/* 検索結果はフォームの下に表示 */}
       <div className="w-full max-w-lg mt-6">
         <SearchResult results={searchResults} />
       </div>
