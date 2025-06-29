@@ -7,9 +7,27 @@ export default function AddSong() {
   const [songContent, setSongContent] = useState("");
   // Gemini API使用時にローディング状態を管理するstateを追加
   const [isLoading, setIsLoading] = useState(false);
+  // 保存処理中のローディング状態を追加
+  const [isSaving, setIsSaving] = useState(false);
+  // 保存結果のメッセージ（成功・失敗）を管理する状態を追加
+  const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
 
   const handleAddSong = async (e) => {
     e.preventDefault();
+
+    if (!songName.trim() || !artistName.trim() || !songContent.trim()) {
+      setSubmitStatus({
+        message: '曲名と歌詞・アーティスト名・コードは必須項目です。'
+        , type: 'error'
+      })
+      alert('歌詞・アーティスト名・コードは必須項目です。')
+      return;
+    }
+
+    setIsSaving(true);
+    setSubmitStatus({ message: '', type: '' })
+
+
 
     const res = await fetch('/api/song', {
       method: 'POST',
