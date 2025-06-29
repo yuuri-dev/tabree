@@ -36,6 +36,8 @@ export default function Home() {
       {/* タブ切り替えの中身 */}
       {activeTab === 'search' && <SearchForm />}
       {activeTab === 'add' && <AddSong />}
+
+      <div className="h-px bg-gray-500 my-4" />
       <Ranking />
     </div>
   );

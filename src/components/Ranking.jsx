@@ -1,6 +1,7 @@
 // components/Ranking.jsx
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { Heart } from 'lucide-react';
 import Link from 'next/link';
 
 const Ranking = () => {
@@ -60,8 +61,9 @@ const Ranking = () => {
                 <p className="text-sm text-gray-500">{song.artist_name}</p>
               </div>
             </Link>
-            <span className="text-red-500 font-bold text-lg">
-              ❤️ {song.good}
+            <span className="flex items-center text-pink-500">
+              <Heart className="w-4 h-4 mr-1 fill-pink-500" />
+              <span className="text-sm font-medium">{song.good}</span>
             </span>
           </li>
         ))}
