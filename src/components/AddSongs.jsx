@@ -27,22 +27,46 @@ export default function AddSong() {
     setIsSaving(true);
     setSubmitStatus({ message: '', type: '' })
 
+    try {
+      const res = await fetch('/api/song', {
+
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: songName,
+          artist: artistName,
+          content: songContent,
+        }),
+      });
 
 
-    const res = await fetch('/api/song', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: songName,
-        artist: artistName,
-        content: songContent,
-      }),
-    });
+      const data = await res.json();
 
-    const data = await res.json();
-    console.log('サーバーからの返答:', data);
+      console.log('サーバーからの返答:', data);
+      // APIからの応答が成功でなかった場合
+      if (!res.ok) {
+        // res.json()でAPIからのエラーメッセージを取得
+        alert('サーバーでエラーが発生しました')
+      }
+
+      // 成功した場合
+      setSubmitStatus({ message: 'タブ譜が正常に追加されました！', type: 'success' });
+
+      // 入力フォームをリセット
+      setSongName('');
+      setArtistName('');
+      setSongContent('');
+
+    } catch (error) {
+      // エラーが発生した場合
+      console.error("保存処理中にエラーが発生しました:", error);
+      setSubmitStatus({ message: error.message || '予期せぬエラーが発生しました。', type: 'error' });
+    } finally {
+      // 成功しても失敗しても、ローディング状態を解除
+      setIsSaving(false);
+    }
   };
 
   const handleGemini = async (e) => {
@@ -146,7 +170,7 @@ export default function AddSong() {
           text-white font-semibold py-2 px-4 rounded-md transition-colors cursor-pointer"
           onClick={(e) => handleAddSong(e)}
         >
-          追加する
+          {isSaving ? '保存中...' : '追加する'}
         </button>
       </form>
     </div>

@@ -61,7 +61,8 @@ export default async function handler(req, res) {
         {
           track_name: title,   // "title"を"track_name"カラムに
           artist_name: artist, // "artist"を"artist_name"カラムに
-          data: jsonDataToInsert       // "content"を"data"カラムに
+          data: jsonDataToInsert,     // "content"を"data"カラムに
+          good: 0 // 0(初期値)として"good"カラムに
         },
       ])
       .select()  // 挿入したレコードを返却するよう指定
