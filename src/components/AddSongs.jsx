@@ -7,24 +7,66 @@ export default function AddSong() {
   const [songContent, setSongContent] = useState("");
   // Gemini API使用時にローディング状態を管理するstateを追加
   const [isLoading, setIsLoading] = useState(false);
+  // 保存処理中のローディング状態を追加
+  const [isSaving, setIsSaving] = useState(false);
+  // 保存結果のメッセージ（成功・失敗）を管理する状態を追加
+  const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
 
   const handleAddSong = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/song', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: songName,
-        artist: artistName,
-        content: songContent,
-      }),
-    });
+    if (!songName.trim() || !artistName.trim() || !songContent.trim()) {
+      setSubmitStatus({
+        message: '曲名と歌詞・アーティスト名・コードは必須項目です。'
+        , type: 'error'
+      })
+      alert('歌詞・アーティスト名・コードは必須項目です。')
+      return;
+    }
 
-    const data = await res.json();
-    console.log('サーバーからの返答:', data);
+    setIsSaving(true);
+    setSubmitStatus({ message: '', type: '' })
+
+    try {
+      const res = await fetch('/api/song', {
+
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: songName,
+          artist: artistName,
+          content: songContent,
+        }),
+      });
+
+
+      const data = await res.json();
+
+      console.log('サーバーからの返答:', data);
+      // APIからの応答が成功でなかった場合
+      if (!res.ok) {
+        // res.json()でAPIからのエラーメッセージを取得
+        alert('サーバーでエラーが発生しました')
+      }
+
+      // 成功した場合
+      setSubmitStatus({ message: 'タブ譜が正常に追加されました！', type: 'success' });
+
+      // 入力フォームをリセット
+      setSongName('');
+      setArtistName('');
+      setSongContent('');
+
+    } catch (error) {
+      // エラーが発生した場合
+      console.error("保存処理中にエラーが発生しました:", error);
+      setSubmitStatus({ message: error.message || '予期せぬエラーが発生しました。', type: 'error' });
+    } finally {
+      // 成功しても失敗しても、ローディング状態を解除
+      setIsSaving(false);
+    }
   };
 
   const handleGemini = async (e) => {
@@ -128,7 +170,7 @@ export default function AddSong() {
           text-white font-semibold py-2 px-4 rounded-md transition-colors cursor-pointer"
           onClick={(e) => handleAddSong(e)}
         >
-          追加する
+          {isSaving ? '保存中...' : '追加する'}
         </button>
       </form>
     </div>
