@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 // components/AddSong.jsx
 export default function AddSong() {
@@ -9,23 +10,16 @@ export default function AddSong() {
   const [isLoading, setIsLoading] = useState(false);
   // 保存処理中のローディング状態を追加
   const [isSaving, setIsSaving] = useState(false);
-  // 保存結果のメッセージ（成功・失敗）を管理する状態を追加
-  const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
 
   const handleAddSong = async (e) => {
     e.preventDefault();
 
     if (!songName.trim() || !artistName.trim() || !songContent.trim()) {
-      setSubmitStatus({
-        message: '曲名と歌詞・アーティスト名・コードは必須項目です。'
-        , type: 'error'
-      })
-      alert('歌詞・アーティスト名・コードは必須項目です。')
+      toast.error('曲名と歌詞・コードは必須項目です')
       return;
     }
 
     setIsSaving(true);
-    setSubmitStatus({ message: '', type: '' })
 
     try {
       const res = await fetch('/api/song', {
@@ -41,7 +35,6 @@ export default function AddSong() {
         }),
       });
 
-
       const data = await res.json();
 
       console.log('サーバーからの返答:', data);
@@ -52,8 +45,7 @@ export default function AddSong() {
       }
 
       // 成功した場合
-      setSubmitStatus({ message: 'タブ譜が正常に追加されました！', type: 'success' });
-
+      toast.success('タブ譜の保存に成功しました！')
       // 入力フォームをリセット
       setSongName('');
       setArtistName('');
@@ -62,7 +54,7 @@ export default function AddSong() {
     } catch (error) {
       // エラーが発生した場合
       console.error("保存処理中にエラーが発生しました:", error);
-      setSubmitStatus({ message: error.message || '予期せぬエラーが発生しました。', type: 'error' });
+      toast.error(error.message || '予期せぬエラーが発生しました。')
     } finally {
       // 成功しても失敗しても、ローディング状態を解除
       setIsSaving(false);
@@ -74,7 +66,7 @@ export default function AddSong() {
 
     // テキストエリアが空の場合は何もしない
     if (!songContent.trim()) {
-      alert('歌詞・コードを何か入力してください。');
+      toast.error('歌詞・コードを何か入力してください。')
       return;
     }
 
@@ -91,6 +83,7 @@ export default function AddSong() {
         body: JSON.stringify({
           current_text: songContent,
         }),
+
       });
 
       // APIからの応答が成功しなかった場合はエラー
@@ -106,7 +99,7 @@ export default function AddSong() {
 
     } catch (error) {
       console.error("予測処理中にエラーが発生しました:", error);
-      alert("予測の取得に失敗しました。");
+      toast.error("予測の取得に失敗しました。");
     } finally {
       setIsLoading(false); // ローディング終了 (成功しても失敗しても実行)
     }
