@@ -18,7 +18,7 @@ export default function SongDetailPage() {
     const fetchSong = async () => {
       const { data, error } = await supabase
         .from('tab')
-        .select('id, track_name, artist_name, data')
+        .select('id, track_name, artist_name, data, good')
         .eq('id', id)
         .single();
 
