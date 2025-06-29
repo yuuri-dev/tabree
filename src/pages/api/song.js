@@ -1,6 +1,36 @@
 // Supabaseクライアントをインポートします
 // このパスはあなたのプロジェクト構成に合わせて調整してください
 import { supabase } from '../../../lib/supabaseClient';
+/**
+ * 文字列形式のタブ譜をJSONオブジェクトに変換するヘルパー関数
+ * @param {string} contentString - 例: "風の強さが[C]ちょっと..."
+ * @returns {Array<Object>} - 例: [{type: "lyric", value: "風の強さが"}, {type: "chord", value: "C"}, ...]
+ */
+function parseTabContent(contentString) {
+  // コード部分にマッチする正規表現 (例: [C], [G/B])
+  const regex = /(\[[^\]]+\])/;
+
+  // 正規表現で文字列を歌詞とコードのパーツに分割
+  const parts = contentString.split(regex);
+
+  // 各パーツを {type, value} の形式に変換
+  const components = parts
+    .filter(part => part && part.trim() !== '') // 空の要素を除外
+    .map(part => {
+      if (part.startsWith('[') && part.endsWith(']')) {
+        return {
+          type: 'chord',
+          value: part.slice(1, -1) // 角括弧[]を削除
+        };
+      } else {
+        return {
+          type: 'lyric',
+          value: part
+        };
+      }
+    });
+  return components;
+}
 
 export default async function handler(req, res) {
   // POSTメソッド以外のリクエストは拒否します
@@ -23,14 +53,15 @@ export default async function handler(req, res) {
     }
 
     // 3. Supabaseの'tabs'テーブルにデータを挿入します
-    // これが console.log の代わりとなる処理です
+    const parsedComponents = parseTabContent(content);
+    const jsonDataToInsert = { components: parsedComponents };
     const { data: newTabData, error } = await supabase
-      .from('tabs') // 'tabs'という名前のテーブルを指定
+      .from('tab') // 'tab'という名前のテーブルを指定
       .insert([     // 配列形式で挿入するデータを指定
         {
           track_name: title,   // "title"を"track_name"カラムに
           artist_name: artist, // "artist"を"artist_name"カラムに
-          data: content        // "content"を"data"カラムに
+          data: jsonDataToInsert       // "content"を"data"カラムに
         },
       ])
       .select()  // 挿入したレコードを返却するよう指定
